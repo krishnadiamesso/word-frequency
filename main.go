@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -15,20 +16,34 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	// 3. Read one line.
-	scanner.Scan()
+	if !scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			fmt.Fprintln(os.Stderr, "Error reading input:", err)
+		}
+		return
+	}
 
 	// 4. Normalize and split the input.
 	text := scanner.Text()
 
 	text = strings.ToLower(text)
 	words := strings.Fields(text)
-	fmt.Printf("%q\n", words)
 
-	result := map[string]int{}
+	result := make(map[string]int)
 
 	for _, word := range words {
 		result[word]++
 	}
 
-	fmt.Println(result)
+	keys := make([]string, 0)
+
+	for key := range result {
+		keys = append(keys, key)
+	}
+
+	sort.Strings(keys)
+
+	for _, word := range keys {
+		fmt.Printf("%s: %d\n", word, result[word])
+	}
 }
